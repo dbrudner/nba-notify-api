@@ -1,5 +1,6 @@
 require("dotenv").config();
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const port = process.env.PORT || 3000;
@@ -13,12 +14,23 @@ mongoose.connect(process.env.ATLAS_URI, { useNewUrlParser: true });
 
 const server = express();
 
+const whitelist = ["https://nba-notify.herokuapp.com/"];
+const corsOptions = {
+	origin: (origin, callback) => {
+		console.log(origin);
+		if (whitelist.indexOf(origin) !== -1) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+};
+
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 
-server.post("/subscribe", (req, res) => {
+server.post("/subscribe", cors(corsOptions), (req, res) => {
 	const { userToken, tricode } = req.body;
-
 	db.Subscription.findOne({ tricode }, (err, subscription) => {
 		if (err) {
 			throw err;
