@@ -1,3 +1,4 @@
+if (process.env.NODE_ENV !== "production") require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
@@ -46,6 +47,16 @@ server.post("/subscribe", (req, res) => {
 				},
 			);
 		}
+	});
+});
+
+server.get("/subscriptions", (req, res) => {
+	db.Subscription.find({}, (err, subscriptions) => {
+		if (err) {
+			throw err;
+		}
+
+		res.json({ subscriptions });
 	});
 });
 
