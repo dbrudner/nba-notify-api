@@ -1,0 +1,32 @@
+{
+	"name": "nba-notify-api",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js",
+		"dev": "nodemon server.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/dbrudner/nba-notify-api.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/dbrudner/nba-notify-api/issues"
+	},
+	"homepage": "https://github.com/dbrudner/nba-notify-api#readme",
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"express": "^4.16.4",
+		"mongodb": "^3.1.13",
+		"mongoose": "^5.4.9"
+	},
+	"devDependencies": {
+		"dotenv": "^6.2.0",
+		"nodemon": "^1.18.9"
+	}
+}
