@@ -21,6 +21,7 @@ server.use(cors());
 server.post("/subscribe", (req, res) => {
 	const { userToken, tricode } = req.body;
 	db.Subscription.findOne({ tricode }, (err, subscription) => {
+		res.header("Access-Control-Allow-Origin", "*");
 		if (err) {
 			throw err;
 		}
