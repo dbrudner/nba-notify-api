@@ -16,7 +16,7 @@ const server = express();
 
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-server.use(cors({ credentials: true, origin: true }));
+server.use(cors());
 
 server.post("/subscribe", (req, res) => {
 	const { userToken, tricode } = req.body;
