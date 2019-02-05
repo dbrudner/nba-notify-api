@@ -1,3 +1,4 @@
 module.exports = {
-	Subscription: require("./team"),
+	Subscription: require("./subscription"),
+	User: require("./user"),
 };

@@ -43,7 +43,38 @@ server.post("/subscribe", (req, res) => {
 				{ tricode },
 				{ $push: { userTokens: userToken } },
 				(err, subscription) => {
-					res.json({ tricode: subscription.tricode });
+					if (err) {
+						throw err;
+					}
+					db.User.findOneAndUpdate(
+						{ userToken },
+						{
+							$push: { subscriptions: tricode },
+						},
+						(err, user) => {
+							if (err) {
+								throw err;
+							}
+
+							if (!user) {
+								db.User.create(
+									{
+										userToken,
+										subscriptions: [tricode],
+									},
+									(err, newUser) => {
+										if (err) {
+											throw err;
+										}
+
+										res.json(newUser);
+									},
+								);
+							} else {
+								res.json({ tricode, user });
+							}
+						},
+					);
 				},
 			);
 		}
@@ -57,6 +88,20 @@ server.get("/subscriptions", (req, res) => {
 		}
 
 		res.json({ subscriptions });
+	});
+});
+
+server.get("/user", (req, res) => {
+	const { user } = req.query;
+});
+
+server.get("/users", (req, res) => {
+	db.User.find({}, (err, users) => {
+		if (err) {
+			throw err;
+		}
+
+		res.json({ users });
 	});
 });
 
