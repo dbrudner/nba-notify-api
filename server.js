@@ -121,7 +121,7 @@ server.get("/subscriptions", (req, res) => {
 
 server.get("/user", (req, res) => {
 	const { userToken } = req.query;
-	db.User.find({ userToken }, (err, user) => {
+	db.User.findOne({ userToken }, (err, user) => {
 		if (err) {
 			throw err;
 		}
