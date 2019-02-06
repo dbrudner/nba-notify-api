@@ -92,7 +92,13 @@ server.get("/subscriptions", (req, res) => {
 });
 
 server.get("/user", (req, res) => {
-	const { user } = req.query;
+	const { _id } = req.query;
+	db.User.find({ _id }, (err, user) => {
+		if (err) {
+			throw err;
+		}
+		res.json(user);
+	});
 });
 
 server.get("/users", (req, res) => {
