@@ -35,7 +35,35 @@ server.post("/subscribe", (req, res) => {
 					if (err) {
 						throw err;
 					}
-					res.json({ tricode: subscription.tricode });
+					db.User.findOneAndUpdate(
+						{ userToken },
+						{
+							$push: { subscriptions: tricode },
+						},
+						(err, user) => {
+							if (err) {
+								throw err;
+							}
+
+							if (!user) {
+								db.User.create(
+									{
+										userToken,
+										subscriptions: [tricode],
+									},
+									(err, newUser) => {
+										if (err) {
+											throw err;
+										}
+
+										res.json(newUser);
+									},
+								);
+							} else {
+								res.json({ tricode, user });
+							}
+						},
+					);
 				},
 			);
 		} else {
