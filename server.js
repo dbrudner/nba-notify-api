@@ -142,6 +142,17 @@ server.get("/subscriptions", (req, res) => {
 	});
 });
 
+server.get("/subscription", (req, res) => {
+	const { tricode } = req.query;
+	db.Subscription.findOne({ tricode }, (err, subscription) => {
+		if (err) {
+			throw err;
+		}
+
+		res.json({ subscription });
+	});
+});
+
 server.get("/user", (req, res) => {
 	const { userToken } = req.query;
 	db.User.findOne({ userToken }, (err, user) => {
