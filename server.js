@@ -109,6 +109,29 @@ server.post("/subscribe", (req, res) => {
 	});
 });
 
+server.post("/unsubscribe", (req, res) => {
+	db.Subscription.findOneAndUpdate(
+		{ tricode: req.body.tricode },
+		{ $pull: { userTokens: req.body.userToken } },
+		(err, subscription) => {
+			if (err) {
+				throw err;
+			}
+
+			db.User.findOneAndUpdate(
+				{ userToken: req.body.userToken },
+				{ $pull: { subscriptions: req.body.tricode } },
+				(err, user) => {
+					if (err) {
+						throw err;
+					}
+					res.json(user);
+				},
+			);
+		},
+	);
+});
+
 server.get("/subscriptions", (req, res) => {
 	db.Subscription.find({}, (err, subscriptions) => {
 		if (err) {
