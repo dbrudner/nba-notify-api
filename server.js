@@ -207,7 +207,6 @@ server.post("/create-beta-key", async (req, res) => {
 	}
 
 	db.betaKey.findOne({ name }, async (err, key) => {
-		console.log(key);
 		if (err) {
 			throw err;
 		}
