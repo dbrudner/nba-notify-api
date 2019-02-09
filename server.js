@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const port = process.env.PORT || 3000;
 const db = require("./models");
 
@@ -170,6 +171,69 @@ server.get("/users", (req, res) => {
 		}
 
 		res.json({ users });
+	});
+});
+
+server.get("/verify", (req, res) => {
+	const { key, name } = req.query;
+
+	db.betaKey.findOne({ name }, (err, betaKey) => {
+		if (err) {
+			throw err;
+		}
+
+		if (!bcrypt.compare(key, betaKey.key)) {
+			res.json
+				.status(401)
+				.json({ valid: false, message: "This key is invalid" });
+		}
+
+		if (betaKey.registeredUsers + 1 >= betaKey.maxUsers) {
+			return res.json.status(401).json({
+				valid: false,
+				message: "This key has reached max allowed users",
+			});
+		}
+
+		return res.json({ valid: true });
+	});
+});
+
+server.post("/create-beta-key", async (req, res) => {
+	const { CREATE_BETA_KEY_SECRET, maxUsers, validUntil, name } = req.body;
+
+	if (CREATE_BETA_KEY_SECRET !== process.env.CREATE_BETA_KEY_SECRET) {
+		return res.status(401).json("go away");
+	}
+
+	db.betaKey.findOne({ name }, async (err, key) => {
+		console.log(key);
+		if (err) {
+			throw err;
+		}
+
+		if (key) {
+			res.status(422).json({ message: "API key name is not unique" });
+		} else {
+			const newKey = await bcrypt.hash(req.body.betaKey, 10);
+
+			await db.betaKey.create(
+				{
+					key: newKey,
+					name: name,
+					maxUsers: maxUsers || 10,
+					registeredUsers: 0,
+					validUntil: validUntil,
+				},
+				(err, betaKey) => {
+					if (err) {
+						throw err;
+					}
+
+					res.json({ name: betaKey.name });
+				},
+			);
+		}
 	});
 });
 
