@@ -182,20 +182,42 @@ server.get("/verify", (req, res) => {
 			throw err;
 		}
 
-		if (!bcrypt.compare(key, betaKey.key)) {
-			res.json
-				.status(401)
-				.json({ valid: false, message: "This key is invalid" });
-		}
+		bcrypt.compare(key, betaKey.key, (err, validKey) => {
+			if (err) {
+				throw err;
+			}
 
-		if (betaKey.registeredUsers + 1 >= betaKey.maxUsers) {
-			return res.json.status(401).json({
-				valid: false,
-				message: "This key has reached max allowed users",
-			});
-		}
+			if (!validKey) {
+				return res.status(401).json({
+					valid: false,
+					message: "This key is invalid",
+				});
+			}
 
-		return res.json({ valid: true });
+			if (betaKey.registeredUsers + 1 >= betaKey.maxUsers) {
+				return res.status(401).json({
+					valid: false,
+					message: "This key has reached max allowed users",
+					registeredUsers: betaKey.registeredUsers,
+					maxUsers: betaKey.maxUsers,
+				});
+			}
+
+			db.betaKey.findOneAndUpdate(
+				{ name },
+				{ $inc: { registeredUsers: 1 } },
+				(err, betaKey) => {
+					if (err) {
+						throw err;
+					}
+					return res.json({
+						valid: true,
+						registeredUsers: betaKey.registeredUsers + 1,
+						maxUsers: betaKey.maxUsers,
+					});
+				},
+			);
+		});
 	});
 });
 
