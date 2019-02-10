@@ -182,6 +182,13 @@ server.get("/verify", (req, res) => {
 			throw err;
 		}
 
+		if (!betaKey) {
+			return res.status(401).json({
+				valid: false,
+				message: "Key name is invalid",
+			});
+		}
+
 		bcrypt.compare(key, betaKey.key, (err, validKey) => {
 			if (err) {
 				throw err;
