@@ -201,7 +201,7 @@ server.get("/verify", (req, res) => {
 				});
 			}
 
-			if (betaKey.registeredUsers + 1 >= betaKey.maxUsers) {
+			if (betaKey.registeredUsers >= betaKey.maxUsers) {
 				return res.status(401).json({
 					valid: false,
 					message: "This key has reached max allowed users",
