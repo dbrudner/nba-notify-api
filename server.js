@@ -21,93 +21,96 @@ server.use(cors());
 
 server.post("/subscribe", (req, res) => {
 	const { userToken, tricode } = req.body;
-	db.Subscription.findOne({ tricode }, (err, subscription) => {
-		if (err) {
-			throw err;
-		}
+	db.Subscription.findOne(
+		{ tricode: tricode.toUpperCase() },
+		(err, subscription) => {
+			if (err) {
+				throw err;
+			}
 
-		if (!subscription) {
-			db.Subscription.create(
-				{
-					tricode,
-					userTokens: [userToken],
-				},
-				(err, subscription) => {
-					if (err) {
-						throw err;
-					}
-					db.User.findOneAndUpdate(
-						{ userToken },
-						{
-							$push: { subscriptions: tricode },
-						},
-						(err, user) => {
-							if (err) {
-								throw err;
-							}
+			if (!subscription) {
+				db.Subscription.create(
+					{
+						tricode: tricode.toUpperCase(),
+						userTokens: [userToken],
+					},
+					(err, subscription) => {
+						if (err) {
+							throw err;
+						}
+						db.User.findOneAndUpdate(
+							{ userToken },
+							{
+								$push: { subscriptions: tricode },
+							},
+							(err, user) => {
+								if (err) {
+									throw err;
+								}
 
-							if (!user) {
-								db.User.create(
-									{
-										userToken,
-										subscriptions: [tricode],
-									},
-									(err, newUser) => {
-										if (err) {
-											throw err;
-										}
+								if (!user) {
+									db.User.create(
+										{
+											userToken,
+											subscriptions: [tricode],
+										},
+										(err, newUser) => {
+											if (err) {
+												throw err;
+											}
 
-										res.json(newUser);
-									},
-								);
-							} else {
-								res.json({ tricode, user });
-							}
-						},
-					);
-				},
-			);
-		} else {
-			db.Subscription.findOneAndUpdate(
-				{ tricode },
-				{ $push: { userTokens: userToken } },
-				(err, subscription) => {
-					if (err) {
-						throw err;
-					}
-					db.User.findOneAndUpdate(
-						{ userToken },
-						{
-							$push: { subscriptions: tricode },
-						},
-						(err, user) => {
-							if (err) {
-								throw err;
-							}
+											res.json(newUser);
+										},
+									);
+								} else {
+									res.json({ tricode, user });
+								}
+							},
+						);
+					},
+				);
+			} else {
+				db.Subscription.findOneAndUpdate(
+					{ tricode },
+					{ $push: { userTokens: userToken } },
+					(err, subscription) => {
+						if (err) {
+							throw err;
+						}
+						db.User.findOneAndUpdate(
+							{ userToken },
+							{
+								$push: { subscriptions: tricode },
+							},
+							(err, user) => {
+								if (err) {
+									throw err;
+								}
 
-							if (!user) {
-								db.User.create(
-									{
-										userToken,
-										subscriptions: [tricode],
-									},
-									(err, newUser) => {
-										if (err) {
-											throw err;
-										}
+								if (!user) {
+									db.User.create(
+										{
+											userToken,
+											subscriptions: [tricode],
+										},
+										(err, newUser) => {
+											if (err) {
+												throw err;
+											}
 
-										res.json(newUser);
-									},
-								);
-							} else {
-								res.json({ tricode, user });
-							}
-						},
-					);
-				},
-			);
-		}
-	});
+											res.json(newUser);
+										},
+									);
+								} else {
+									res.json({ tricode, user });
+								}
+							},
+						);
+					},
+				);
+			}
+		},
+	);
 });
 
 server.post("/unsubscribe", (req, res) => {
@@ -145,13 +148,15 @@ server.get("/subscriptions", (req, res) => {
 
 server.get("/subscription", (req, res) => {
 	const { tricode } = req.query;
-	db.Subscription.findOne({ tricode }, (err, subscription) => {
-		if (err) {
-			throw err;
-		}
-
-		res.json({ subscription });
-	});
+	db.Subscription.findOne(
+		{ tricode: tricode.toUpperCase() },
+		(err, subscription) => {
+			if (err) {
+				throw err;
+			}
+			res.json({ subscription });
+		},
+	);
 });
 
 server.get("/user", (req, res) => {
