@@ -163,9 +163,9 @@ server.get("/subscription", (req, res) => {
 					},
 				};
 				res.json(response);
+			} else {
+				res.json({ subscription });
 			}
-
-			res.json({ subscription });
 		},
 	);
 });
