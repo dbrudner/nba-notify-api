@@ -154,6 +154,17 @@ server.get("/subscription", (req, res) => {
 			if (err) {
 				throw err;
 			}
+
+			if (!subscription) {
+				const response = {
+					subscription: {
+						userTokens: [],
+						tricode,
+					},
+				};
+				res.json(response);
+			}
+
 			res.json({ subscription });
 		},
 	);
@@ -268,6 +279,46 @@ server.post("/create-beta-key", async (req, res) => {
 			);
 		}
 	});
+});
+
+server.get("/refresh-token", (req, res) => {
+	const { oldToken, newToken } = req.query;
+
+	db.Subscription.find(
+		{
+			userTokens:
+				"cFRulNJAeZ4:APA91bGWhwFvbl-Ncq3Pt2n1WskScRI0Gn0MELDHHQOC-mGMV4dpitiOJVUI79AWuBDU3temCqwU7LbDPL1TcZfv9nMaehxsTXmma7_4lYWSx5nP8eOe0qLlSh_xeGeagyFrXAWpJ2c9",
+		},
+		(err, sub) => {
+			if (err) throw err;
+			res.json(sub);
+		},
+	);
+
+	// db.Subscription.updateMany(
+	// 	{},
+	// 	{ $set: { "userTokens.0": "b234lah" } },
+	// 	(err, rz) => {
+	// 		if (err) {
+	// 			throw err;
+	// 		}
+
+	// 		console.log(rz);
+	// 		res.json(rz);
+	// 	},
+	// );
+
+	// db.Subscription.updateMany(
+	// 	{ userTokens: oldToken },
+	// 	{ $push: { userTokens: newToken } },
+	// ),
+	// 	(err, subscriptions) => {
+	// 		if (err) {
+	// 			throw err;
+	// 		}
+
+	// 		res.json(subscriptions);
+	// 	};
 });
 
 server.listen(port, err => {
